@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <title>Mahsulotlar ro‘yxati</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f5f5;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #333;
+        }
+
+        /* Filter panel */
+        .filter-form {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .filter-form select, .view-toggle {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            background: #fff;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        /* Grid */
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            padding: 0 20px; /* 👈 chap va o‘ngdan joy qoldirdik */
+        }
+
+        /* Card */
+        .product-card {
+            background: #fff;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            text-align: center;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.25);
+        }
+
+        .product-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+        }
+
+        .product-content {
+            padding: 15px;
+        }
+
+        .product-title {
+            font-size: 20px;
+            font-weight: bold;
+            margin: 0 0 10px;
+            color: #222;
+        }
+
+        .product-title a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .product-price {
+            font-size: 18px;
+            color: #e63946;
+            margin: 5px 0;
+            font-weight: bold;
+        }
+
+        .product-feature {
+            font-size: 14px;
+            color: #666;
+        }
+
+        /* LIST view */
+        .product-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            padding: 0 20px; /* 👈 chap va o‘ngdan joy qoldirdik */
+        }
+
+        .list-item {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            padding: 18px;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .list-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.25);
+        }
+
+        .list-item img {
+            width: 70px;
+            height: 70px;
+            object-fit: cover;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .list-item span {
+            font-size: 18px;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .list-item a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Mahsulotlar ro‘yxati</h1>
+
+<form method="get" id="filter-form" class="filter-form">
+    <select name="category" onchange="document.getElementById('filter-form').submit();">
+        <option value="">Hammasi</option>
+        {% for cat in categories %}
+            <option value="{{ cat.id }}" {% if request.GET.category == cat.id|stringformat:"s" %}selected{% endif %}>
+                {{ cat.name }}
+            </option>
+        {% endfor %}
+    </select>
+
+    <select name="sort" onchange="document.getElementById('filter-form').submit();">
+        <option value="">Tartib</option>
+        <option value="asc" {% if request.GET.sort == "asc" %}selected{% endif %}>Narx ↑</option>
+        <option value="desc" {% if request.GET.sort == "desc" %}selected{% endif %}>Narx ↓</option>
+    </select>
+
+    <!-- View toggle -->
+    <button type="button" class="view-toggle" onclick="toggleView()">Ko‘rinishni almashtirish</button>
+</form>
+
+<!-- GRID view -->
+<div id="grid-view" class="product-grid">
+    {% for product in products %}
+        <div class="product-card">
+            <a href="{% url 'product_detail' product.slug %}">
+                {% for img in product.images.all %}
+                    {% if img.is_main %}
+                        <img src="{{ img.image.url }}" alt="{{ product.title }}" class="product-image">
+                    {% endif %}
+                {% endfor %}
+            </a>
+            <div class="product-content">
+                <h3 class="product-title">
+                    <a href="{% url 'product_detail' product.slug %}">{{ product.title }}</a>
+                </h3>
+                <p class="product-price">{{ product.price }} so‘m</p>
+                <p class="product-feature">{{ product.feature }}</p>
+            </div>
+        </div>
+    {% empty %}
+        <p>Mahsulot topilmadi.</p>
+    {% endfor %}
+</div>
+
+<!-- LIST view -->
+<div id="list-view" class="product-list hidden">
+    {% for product in products %}
+        <div class="list-item">
+            <a href="{% url 'product_detail' product.slug %}">
+                {% for img in product.images.all %}
+                    {% if img.is_main %}
+                        <img src="{{ img.image.url }}" alt="{{ product.title }}">
+                    {% endif %}
+                {% endfor %}
+            </a>
+            <a href="{% url 'product_detail' product.slug %}">
+                <span>🏞️ {{ product.title }} — {{ product.price }} so‘m</span>
+            </a>
+        </div>
+        
+    {% empty %}
+        <p>Mahsulot topilmadi.</p>
+    {% endfor %}
+</div>
+
+<script>
+    function toggleView() {
+        document.getElementById("grid-view").classList.toggle("hidden");
+        document.getElementById("list-view").classList.toggle("hidden");
+    }
+</script>
+</body>
+</html>
+
+
