@@ -1,8 +1,17 @@
 from django.contrib import admin
-from .models import *
-# from .models.category import Category
-# from .models.product import Product
-# from .models.product_image import ProductImage
+from django import forms
+from ckeditor.widgets import CKEditorWidget
+from .models import Category, Product, ProductImage
+
+
+# CKEditor qo‘llash uchun custom forma
+class ProductAdminForm(forms.ModelForm):
+    feature = forms.CharField(widget=CKEditorWidget())
+    description = forms.CharField(widget=CKEditorWidget())
+
+    class Meta:
+        model = Product
+        fields = "__all__"
 
 
 class ProductImageInline(admin.TabularInline):
@@ -22,6 +31,7 @@ class CategoryAdmin(admin.ModelAdmin):
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
+    form = ProductAdminForm  # CKEditor ishlashi uchun custom forma
     list_display = ("title", "category", "price", "is_active", "created_at")
     list_filter = ("category", "is_active", "created_at")
     search_fields = ("title", "feature", "description")
