@@ -1,170 +1,20 @@
-<!DOCTYPE html>
-<html lang="uz">
-<head>
-    <meta charset="UTF-8">
-    <title>{{ product.title }}</title>
-    <style>
-        body {
-            font-family: 'Segoe UI', Arial, sans-serif;
-            background: #fafafa;
-            margin: 0;
-            padding: 20px;
-            color: #222;
-            line-height: 1.6;
-        }
+{% extends 'base.html' %}
+{% block title %}{{ product.title }}{% endblock %}
 
-        .container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 30px;
-            max-width: 1100px;
-            margin: auto;
-        }
-
-        /* Gallery */
-        .gallery {
-            flex: 1;
-            max-width: 480px;
-            display: flex;
-            gap: 12px;
-        }
-        .thumbnails {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            max-height: 340px;
-            overflow-y: auto;
-        }
-        .thumbnails img {
-            width: 70px;
-            height: 70px;
-            object-fit: cover;
-            cursor: pointer;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            transition: 0.2s;
-        }
-        .thumbnails img:hover {
-            border-color: #007bff;
-            transform: scale(1.05);
-        }
-        .main-image {
-            flex: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .main-image img {
-            width: 100%;
-            max-height: 480px;
-            object-fit: contain;
-            border-radius: 8px;
-            cursor: pointer;
-            background: #fff;
-            padding: 8px;
-            border: 1px solid #eee;
-        }
-
-        /* Modal */
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 9999;
-            inset: 0;
-            background: rgba(0,0,0,0.9);
-        }
-        .modal-content {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100%;
-        }
-        .modal-content img {
-            max-width: 90%;
-            max-height: 90%;
-        }
-        .close, .prev, .next {
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            font-size: 36px;
-            color: white;
-            cursor: pointer;
-            user-select: none;
-        }
-        .close {
-            top: 25px;
-            right: 30px;
-            transform: none;
-        }
-        .prev { left: 30px; }
-        .next { right: 30px; }
-
-        /* Product info */
-        .info {
-            flex: 1;
-            padding: 18px;
-            background: #fff;
-            border: 1px solid #eee;
-            border-radius: 8px;
-        }
-        .info h1 {
-            margin: 0 0 15px;
-            font-size: 26px;
-            font-weight: 600;
-        }
-        .price {
-            font-size: 24px;
-            font-weight: bold;
-            color: #e63946;
-            margin: 10px 0 20px;
-        }
-        .features {
-            font-size: 15px;
-            color: #444;
-            padding: 12px;
-            background: #f9f9f9;
-            border-radius: 6px;
-        }
-
-        /* Section - description */
-        .section {
-            max-width: 1100px;
-            margin: 40px auto 0;
-            padding: 20px;
-            background: #fff;
-            border-radius: 8px;
-            border: 1px solid #eee;
-        }
-        .section h2 {
-            font-size: 20px;
-            margin-bottom: 12px;
-            border-bottom: 2px solid #f0f0f0;
-            padding-bottom: 6px;
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            body { padding: 12px; }
-            .container { flex-direction: column; }
-            .gallery { flex-direction: column; }
-            .thumbnails { flex-direction: row; overflow-x: auto; max-height: none; }
-        }
-    </style>
-</head>
-<body>
-
+{% block content %}
 <div class="container">
     <!-- Gallery -->
     <div class="gallery">
         <div class="thumbnails">
             {% for img in product.images.all %}
-                <img src="{{ img.image.url }}" alt="{{ product.title }}" onclick="changeImage('{{ img.image.url }}', {{ forloop.counter0 }})">
+                <img src="{{ img.image.url }}" alt="{{ product.title }}"
+                     onclick="changeImage('{{ img.image.url }}', {{ forloop.counter0 }})">
             {% endfor %}
         </div>
         <div class="main-image">
             {% if product.images.all %}
-                <img id="mainImage" src="{{ product.images.first.image.url }}" alt="{{ product.title }}" onclick="openModal(currentIndex)">
+                <img id="mainImage" src="{{ product.images.first.image.url }}"
+                     alt="{{ product.title }}" onclick="openModal(currentIndex)">
             {% endif %}
         </div>
     </div>
@@ -195,35 +45,15 @@
         <img id="modalImage" src="">
     </div>
 </div>
+{% endblock %}
 
+{% block extra_js %}
 <script>
-    let images = [
+    images = [
         {% for img in product.images.all %}
             "{{ img.image.url }}",
         {% endfor %}
     ];
-    let currentIndex = 0;
-
-    function changeImage(src, index) {
-        document.getElementById("mainImage").src = src;
-        currentIndex = index;
-    }
-
-    function openModal(index) {
-        currentIndex = index;
-        document.getElementById("imageModal").style.display = "block";
-        document.getElementById("modalImage").src = images[currentIndex];
-    }
-
-    function closeModal() {
-        document.getElementById("imageModal").style.display = "none";
-    }
-
-    function changeModal(step) {
-        currentIndex = (currentIndex + step + images.length) % images.length;
-        document.getElementById("modalImage").src = images[currentIndex];
-    }
+    currentIndex = 0;
 </script>
-
-</body>
-</html>
+{% endblock %}
