@@ -13,7 +13,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = "django-insecure-r$xuy&tz3=l%6o0_&j+e3yn0_q&66^i)ci(!vgohb(lso$@ae7"
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+# DEBUG = True
+DEBUG = False
+
 
 ALLOWED_HOSTS = ["*"]
 
@@ -43,6 +45,7 @@ CKEDITOR_CONFIGS = {
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -118,9 +121,9 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 # Static & Media
-STATIC_URL = '/static/'
+STATIC_URL = "/static/"
 STATICFILES_DIRS = [BASE_DIR / "static"]  # loyihadagi umumiy static papka
-STATIC_ROOT = BASE_DIR / "staticfiles"    # collectstatic uchun
+STATIC_ROOT = BASE_DIR / "staticfiles"  # collectstatic uchun
 
 
 MEDIA_URL = "/media/"
